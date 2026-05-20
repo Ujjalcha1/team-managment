@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '@/stores/authStore';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -36,12 +36,22 @@ export default function SettingsPage() {
   const [isUpdatingProfile, setIsUpdatingProfile] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState(user?.profileImage || '');
+  const [imagePreview, setImagePreview] = useState('');
 
   const profileForm = useForm({
     resolver: zodResolver(profileSchema),
-    defaultValues: { name: user?.name || '', department: user?.department || '' },
+    defaultValues: { name: '', department: '' },
   });
+
+  useEffect(() => {
+    if (user) {
+      profileForm.reset({
+        name: user.name || '',
+        department: user.department || '',
+      });
+      setImagePreview(user.profileImage || '');
+    }
+  }, [user, profileForm]);
 
   const passwordForm = useForm({
     resolver: zodResolver(passwordSchema),

@@ -1,5 +1,5 @@
 'use client';
-import { useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAnalyticsStore } from '@/stores/analyticsStore';
 import { useAuthStore } from '@/stores/authStore';
 import { useEmployeeStore } from '@/stores/employeeStore';
@@ -29,8 +29,10 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
   const { overview, departments, growth, roles, activity, isLoading, fetchAll } = useAnalyticsStore();
   const { fetchEmployees } = useEmployeeStore();
+  const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     fetchAll();
     fetchEmployees({ limit: 5 });
   }, [fetchAll, fetchEmployees]);
@@ -73,11 +75,11 @@ export default function DashboardPage() {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-foreground">
-            Good {new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening'},{' '}
-            <span className="gradient-text">{user?.name?.split(' ')[0]}</span> 👋
+            Good {mounted ? (new Date().getHours() < 12 ? 'morning' : new Date().getHours() < 18 ? 'afternoon' : 'evening') : 'day'},{' '}
+            <span className="gradient-text">{mounted && user ? user.name.split(' ')[0] : ''}</span> 👋
           </h1>
           <p className="text-muted-foreground text-sm mt-0.5">
-            {format(new Date(), 'EEEE, MMMM d, yyyy')} · Here's your team overview
+            {mounted ? format(new Date(), 'EEEE, MMMM d, yyyy') : 'Loading date...'} · Here's your team overview
           </p>
         </div>
         <Link href="/employees">
@@ -253,7 +255,7 @@ export default function DashboardPage() {
                     <p className="text-xs font-medium text-foreground truncate">{log.description}</p>
                     <div className="flex items-center gap-1 mt-0.5 text-[10px] text-muted-foreground">
                       <Clock className="w-2.5 h-2.5" />
-                      <span>{format(new Date(log.createdAt), 'MMM d, h:mm a')}</span>
+                      <span>{mounted ? format(new Date(log.createdAt), 'MMM d, h:mm a') : '...'}</span>
                     </div>
                   </div>
                 </div>

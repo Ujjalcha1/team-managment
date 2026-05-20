@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import { useTheme } from 'next-themes';
 import { useAuthStore } from '@/stores/authStore';
 import { Button } from '@/components/ui/button';
@@ -22,6 +23,11 @@ export default function Header({ onMenuClick, sidebarCollapsed }: HeaderProps) {
   const { theme, setTheme } = useTheme();
   const { user, logout } = useAuthStore();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -37,7 +43,9 @@ export default function Header({ onMenuClick, sidebarCollapsed }: HeaderProps) {
           <Menu className="w-5 h-5" />
         </Button>
         <div className="hidden lg:block">
-          <h2 className="text-sm font-semibold text-foreground">Welcome back, {user?.name?.split(' ')[0]} 👋</h2>
+          <h2 className="text-sm font-semibold text-foreground">
+            {mounted && user ? `Welcome back, ${user.name.split(' ')[0]} 👋` : 'Welcome back 👋'}
+          </h2>
           <p className="text-xs text-muted-foreground">Here's what's happening with your team</p>
         </div>
       </div>
@@ -57,43 +65,47 @@ export default function Header({ onMenuClick, sidebarCollapsed }: HeaderProps) {
         </Button>
 
         {/* User Menu */}
-        <DropdownMenu>
-          <DropdownMenuTrigger className="flex items-center gap-2 h-9 px-2 rounded-xl hover:bg-accent outline-none">
-              <Avatar className="w-7 h-7 ring-2 ring-primary/20">
-                <AvatarImage src={user?.profileImage} />
-                <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-                  {getInitials(user?.name || 'U')}
-                </AvatarFallback>
-              </Avatar>
-              <div className="hidden md:block text-left">
-                <p className="text-sm font-medium leading-none">{user?.name}</p>
-                <p className="text-xs text-muted-foreground capitalize mt-0.5">{user?.role}</p>
-              </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-52">
-            <DropdownMenuLabel className="font-normal">
-              <div className="flex flex-col gap-1">
-                <p className="font-semibold">{user?.name}</p>
-                <p className="text-xs text-muted-foreground">{user?.email}</p>
-              </div>
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <Link href="/settings" className="cursor-pointer w-full flex items-center">
-                <User className="mr-2 h-4 w-4" /> Profile
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Link href="/settings" className="cursor-pointer w-full flex items-center">
-                <Settings className="mr-2 h-4 w-4" /> Settings
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer">
-              <LogOut className="mr-2 h-4 w-4" /> Log out
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+        {mounted && user ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger className="flex items-center gap-2 h-9 px-2 rounded-xl hover:bg-accent outline-none">
+                <Avatar className="w-7 h-7 ring-2 ring-primary/20">
+                  <AvatarImage src={user.profileImage} />
+                  <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+                    {getInitials(user.name || 'U')}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden md:block text-left">
+                  <p className="text-sm font-medium leading-none">{user.name}</p>
+                  <p className="text-xs text-muted-foreground capitalize mt-0.5">{user.role}</p>
+                </div>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-52">
+              <DropdownMenuLabel className="font-normal">
+                <div className="flex flex-col gap-1">
+                  <p className="font-semibold">{user.name}</p>
+                  <p className="text-xs text-muted-foreground">{user.email}</p>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <Link href="/settings" className="cursor-pointer w-full flex items-center">
+                  <User className="mr-2 h-4 w-4" /> Profile
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Link href="/settings" className="cursor-pointer w-full flex items-center">
+                  <Settings className="mr-2 h-4 w-4" /> Settings
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={handleLogout} className="text-destructive focus:text-destructive cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" /> Log out
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <div className="w-9 h-9 rounded-full bg-muted animate-pulse shrink-0" />
+        )}
       </div>
     </header>
   );

@@ -1,4 +1,5 @@
 'use client';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { cn } from '@/lib/utils';
@@ -31,6 +32,11 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
   const pathname = usePathname();
   const { user, logout } = useAuthStore();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -84,25 +90,37 @@ export default function Sidebar({ collapsed, onToggle, mobileOpen, onMobileClose
 
       {/* User */}
       <div className="p-3 border-t border-border/50">
-        <div className={cn('flex items-center gap-3 px-2 py-2 rounded-xl bg-accent/50', collapsed && 'justify-center px-1')}>
-          <Avatar className="w-8 h-8 shrink-0 ring-2 ring-primary/20">
-            <AvatarImage src={user?.profileImage} />
-            <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
-              {getInitials(user?.name || 'U')}
-            </AvatarFallback>
-          </Avatar>
-          {!collapsed && (
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium truncate">{user?.name}</p>
-              <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
-            </div>
-          )}
-          {!collapsed && (
-            <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive" onClick={handleLogout}>
-              <LogOut className="w-3.5 h-3.5" />
-            </Button>
-          )}
-        </div>
+        {mounted && user ? (
+          <div className={cn('flex items-center gap-3 px-2 py-2 rounded-xl bg-accent/50', collapsed && 'justify-center px-1')}>
+            <Avatar className="w-8 h-8 shrink-0 ring-2 ring-primary/20">
+              <AvatarImage src={user?.profileImage} />
+              <AvatarFallback className="bg-primary text-primary-foreground text-xs font-semibold">
+                {getInitials(user?.name || 'U')}
+              </AvatarFallback>
+            </Avatar>
+            {!collapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{user?.name}</p>
+                <p className="text-xs text-muted-foreground capitalize">{user?.role}</p>
+              </div>
+            )}
+            {!collapsed && (
+              <Button variant="ghost" size="icon" className="h-7 w-7 shrink-0 text-muted-foreground hover:text-destructive" onClick={handleLogout}>
+                <LogOut className="w-3.5 h-3.5" />
+              </Button>
+            )}
+          </div>
+        ) : (
+          <div className={cn('flex items-center gap-3 px-2 py-2 rounded-xl bg-accent/50 animate-pulse', collapsed && 'justify-center px-1')}>
+            <div className="w-8 h-8 rounded-full bg-muted shrink-0" />
+            {!collapsed && (
+              <div className="flex-1 space-y-1.5">
+                <div className="h-3 bg-muted rounded w-3/4" />
+                <div className="h-2 bg-muted rounded w-1/2" />
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </div>
   );

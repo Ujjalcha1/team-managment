@@ -39,6 +39,8 @@ export default function EmployeeDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const { selectedEmployee, isLoading, fetchEmployee, deleteEmployee, clearSelected } = useEmployeeStore();
   const [deleteOpen, setDeleteOpen] = useState(false);
 
@@ -91,7 +93,7 @@ export default function EmployeeDetailPage() {
   }
 
   const emp = selectedEmployee;
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = mounted && user?.role === 'admin';
 
   const InfoRow = ({ icon: Icon, label, value, color = 'text-muted-foreground' }: {
     icon: any; label: string; value: string | number | undefined; color?: string;

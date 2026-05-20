@@ -4,7 +4,7 @@ import type { NextRequest } from 'next/server';
 const publicRoutes = ['/login', '/register'];
 const protectedRoutes = ['/dashboard', '/employees', '/analytics', '/settings'];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   const token = request.cookies.get('token')?.value || request.headers.get('authorization')?.replace('Bearer ', '');
 

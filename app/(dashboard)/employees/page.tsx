@@ -67,6 +67,8 @@ const roleColors: Record<string, string> = {
 
 export default function EmployeesPage() {
   const { user } = useAuthStore();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => { setMounted(true); }, []);
   const {
     employees, pagination, filters, isLoading, isSubmitting,
     fetchEmployees, createEmployee, updateEmployee, deleteEmployee, uploadImage,
@@ -159,7 +161,7 @@ export default function EmployeesPage() {
     }
   };
 
-  const isAdmin = user?.role === 'admin';
+  const isAdmin = mounted && user?.role === 'admin';
 
   const EmployeeForm = () => (
     <form id="emp-form" onSubmit={handleSubmit(onSubmit)} className="space-y-4">
